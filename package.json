@@ -1,0 +1,21 @@
+{
+  "name": "eslint-prettier-next-15",
+  "version": "0.1.11",
+  "description": "Automated ESLint and Prettier setup for Next.js 15 projects",
+  "main": "bin/install.js",
+  "type": "module",
+  "bin": {
+    "eslint-prettier-next15": "./bin/install.js"
+  },
+  "repository": "https://github.com/seu-usuario/eslint-prettier-next15",
+  "keywords": [
+    "eslint",
+    "prettier",
+    "nextjs"
+  ],
+  "author": "Daniel Luiz Alves",
+  "license": "MIT",
+  "dependencies": {
+    "inquirer": "^12.3.2"
+  }
+}
