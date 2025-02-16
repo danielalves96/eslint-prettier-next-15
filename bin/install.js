@@ -229,7 +229,9 @@ async function main() {
     "eslint-config-prettier@9.1.0",
     "eslint-plugin-prettier@5.2.1",
     "prettier@3.4.2",
-    "prettier-plugin-sort-json@4.1.1"
+    "prettier-plugin-sort-json@4.1.1",
+    "eslint-plugin-tailwindcss@3.18.0",
+    "prettier-plugin-tailwindcss@0.6.11"
   ];
 
 
@@ -252,6 +254,7 @@ import js from "@eslint/js";
 import typescriptEslintEslintPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import prettier from "eslint-plugin-prettier";
+import tailwind from "eslint-plugin-tailwindcss";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -266,6 +269,7 @@ export default [
   {
     plugins: {
       prettier,
+      tailwind,
     },
     rules: {
       "prettier/prettier": "error",
@@ -309,6 +313,7 @@ export default [
       "@typescript-eslint/no-var-requires": "off",
     },
   },
+  ...tailwind.configs["flat/recommended"],
 ];`
   );
 
@@ -319,7 +324,7 @@ export default [
   "singleQuote": false,
   "tabWidth": 2,
   "trailingComma": "es5",
-  "plugins": ["@ianvs/prettier-plugin-sort-imports", "prettier-plugin-sort-json"],
+  "plugins": ["@ianvs/prettier-plugin-sort-imports", "prettier-plugin-sort-json", "prettier-plugin-tailwindcss"],
   "importOrder": [
     "^(react/(.*)$)|^(react$)",
     "^(next/(.*)$)|^(next$)",
