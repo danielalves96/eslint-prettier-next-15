@@ -15,25 +15,25 @@ This script automates the setup of ESLint and Prettier for Next.js 15 projects, 
 You can run this setup in a Next.js 15 project using the following command:
 
 ```sh
-npx eslint-prettier-next
+npx eslint-prettier-next-15
 ```
 
 or if using `yarn`:
 
 ```sh
-yarn dlx eslint-prettier-next
+yarn dlx eslint-prettier-next-15
 ```
 
 or with `pnpm`:
 
 ```sh
-pnpm dlx eslint-prettier-next
+pnpm dlx eslint-prettier-next-15
 ```
 
 or with `bun`:
 
 ```sh
-bunx eslint-prettier-next
+bunx eslint-prettier-next-15
 ```
 
 ## 📦 Dependencies Installed
