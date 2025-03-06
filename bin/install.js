@@ -127,6 +127,15 @@ async function main() {
     }
   ]);
 
+  const TailwindQuestion = await inquirer.prompt([
+    {
+      type: "list",
+      name: "useTailwind",
+      message: "📌 Do you want to include TailwindCSS configuration?",
+      choices: ["Yes", "No"],
+    }
+  ]);
+
   const isTypeScript = TypeScriptQuestion.typescript === "TypeScript";
 
   if (!isTypeScript) {
@@ -182,6 +191,7 @@ async function main() {
     "eslint-plugin-jsx-a11y",
     "@next/eslint-plugin-next",
     "eslint-plugin-tailwindcss",
+    "prettier-plugin-tailwindcss",
     "@babel/eslint-parser",
     "eslint-plugin-simple-import-sort"
   ];
@@ -218,7 +228,7 @@ async function main() {
 
   console.log("✅ Old dependencies and lockfile removed!");
 
-  const installPackages = [
+  const basePackages = [
     "@eslint/eslintrc@3.2.0",
     "@eslint/js@9.18.0",
     "@ianvs/prettier-plugin-sort-imports@4.4.0",
@@ -232,7 +242,15 @@ async function main() {
     "prettier-plugin-sort-json@4.1.1"
   ];
 
+  const tailwindPackages = [
+    "eslint-plugin-tailwindcss@3.18.0",
+    "prettier-plugin-tailwindcss@0.6.11"
+  ];
 
+  const installPackages = [
+    ...basePackages,
+    ...(TailwindQuestion.useTailwind === "Yes" ? tailwindPackages : [])
+  ];
   const installSuccess = installDependencies(packageManager, installPackages);
 
   if (!installSuccess) {
@@ -241,7 +259,6 @@ async function main() {
   }
 
   console.log("✅ Dependencies installed successfully!");
-
   fs.writeFileSync(
     path.join(projectPath, "eslint.config.mjs"),
     `/* eslint-disable import/no-anonymous-default-export */
@@ -251,7 +268,7 @@ import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
 import typescriptEslintEslintPlugin from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
-import prettier from "eslint-plugin-prettier";
+import prettier from "eslint-plugin-prettier";${TailwindQuestion.useTailwind === "Yes" ? '\nimport tailwind from "eslint-plugin-tailwindcss";' : ''}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -265,7 +282,7 @@ export default [
   ...compat.extends("next", "next/core-web-vitals", "prettier"),
   {
     plugins: {
-      prettier,
+      prettier,${TailwindQuestion.useTailwind === "Yes" ? '\n      tailwind,' : ''}
     },
     rules: {
       "prettier/prettier": "error",
@@ -308,30 +325,39 @@ export default [
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-var-requires": "off",
     },
-  },
-];`
+  },${
+    TailwindQuestion.useTailwind === "Yes"
+      ? '\n  ...tailwind.configs["flat/recommended"],'
+      : ''
+  }
+];
+`
   );
+  const prettierConfig = {
+    printWidth: 120,
+    singleQuote: false,
+    tabWidth: 2,
+    trailingComma: "es5",
+    plugins: [
+      "@ianvs/prettier-plugin-sort-imports",
+      "prettier-plugin-sort-json",
+      ...(TailwindQuestion.useTailwind === "Yes" ? ["prettier-plugin-tailwindcss"] : [])
+    ],
+    importOrder: [
+      "^(react/(.*)$)|^(react$)",
+      "^(next/(.*)$)|^(next$)",
+      "<THIRD_PARTY_MODULES>",
+      "",
+      "^@/(.*)$",
+      "^[./]"
+    ],
+    importOrderParserPlugins: ["typescript", "jsx", "decorators-legacy"]
+  };
 
   fs.writeFileSync(
     path.join(projectPath, ".prettierrc.json"),
-    `{
-  "printWidth": 120,
-  "singleQuote": false,
-  "tabWidth": 2,
-  "trailingComma": "es5",
-  "plugins": ["@ianvs/prettier-plugin-sort-imports", "prettier-plugin-sort-json"],
-  "importOrder": [
-    "^(react/(.*)$)|^(react$)",
-    "^(next/(.*)$)|^(next$)",
-    "<THIRD_PARTY_MODULES>",
-    "",
-    "^@/(.*)$",
-    "^[./]"
-  ],
-  "importOrderParserPlugins": ["typescript", "jsx", "decorators-legacy"]
-}`
+    JSON.stringify(prettierConfig, null, 2)
   );
-
   fs.writeFileSync(path.join(projectPath, ".prettierignore"), `/node_modules\n/.next\n/out\n/build`);
 
   console.log("✅ Created `eslint.config.mjs` and Prettier configuration files.");
